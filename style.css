@@ -1,0 +1,47 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+
+body{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: center;
+    align-content: center;
+    align-items: center;
+}
+
+
+/*Table style*/
+#wrapper{
+    position: relative;
+    width: 500px;
+    height: 500px;
+    border: 1px solid black!important;
+    border-collapse: collapse;
+
+}
+
+
+.td{
+    width: 25px;
+    height: 25px;
+}
+
+.taken{
+    background-color: green;
+    
+}
+
+.food{
+    background-color: green;
+
+}

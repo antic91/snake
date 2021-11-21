@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body onkeyup="keyUp(event)">
+    <table   id="wrapper">
+
+    </table>    
+
+    <script>
+        /* boolean to check if the food is already there*/
+        foodBoolean = false;
+
+        /*Var tocatch direction when we get the food to push two arrays*/
+        var directionMove = "X";
+        /*N number for rows */
+        var n = 25;
+
+        /*Array with arrays to check if the td is taken..*/
+        var array = []; 
+
+        /*Lenght of snake*/
+        var snakeLength = 2;
+
+        /*Direction of snake*/
+        var direction = {
+            x:1,
+            y:0
+        }
+
+        /*Position of snake*/
+        var startingPosition = [
+            {x:5,y:12},
+            {x:6,y:12}
+        ];
+
+        /*Setting up the array on start************************/
+        function setArray(n){
+            array = [];
+            for(var i = 0; i<n;i++){
+                array.push([]);
+                for(var j = 0; j<n; j++){
+                    
+                    if(i == startingPosition[0].y && j == startingPosition[0].x || i == startingPosition[1].y && j == startingPosition[1].x){
+                        array[i].push("taken");
+                    }else{
+                        array[i].push(null);
+                    }
+                    
+                }
+            }
+            /*calling function to add td in table and set the snake at beginning*/
+            addRows(n);
+        }
+
+
+        /*Function to set up the rows!!!*/
+        function addRows(n){
+            var table = document.getElementById("wrapper");
+            table.innerHTML = "";
+            for(var i = 0; i<n;i++){
+                var row = document.createElement("tr");
+                for(var j = 0; j<n; j++){
+                    const td = document.createElement("td");
+                    td.className = "td";
+                    if(array[i][j] != null && array[i][j]=="taken") td.classList.add("taken");
+                    if(array[i][j] != null && array[i][j] =="food") td.classList.add("food");
+
+                    row.appendChild(td);
+                }
+                table.appendChild(row);
+            }
+            /*If there is no food, call setFood function to add one*/
+            if(!foodBoolean){
+                setFood();
+            }
+            
+        }
+
+        /*keyUp event----catching event and setting new direction*/
+        function keyUp(e){
+
+            /*Catching event*/
+            if(e.keyCode == 38){
+                /*Arrow up key*/
+                if(direction.x !=0 && direction.y != 1){
+                    directionMove = "Y"
+                    direction = {
+                        x:0,
+                        y:-1
+                    };
+                }
+
+            }
+            if(e.keyCode == 40){
+                /*Arrow down key*/ 
+                if(direction.x != 0 && direction.y != -1){
+                    directionMove = "Y"
+                    direction = {
+                        x:0,
+                        y:1
+                    };
+                }
+            }
+            if(e.keyCode == 39){
+                /*Arrow right key*/
+                if(direction.x != -1 && direction.y != 0){
+                    directionMove = "X"
+                    direction = {
+                        x:1,
+                        y:0
+                    };
+                }
+            }
+            if(e.keyCode == 37){
+                /*Arrow left key*/
+                if(direction.x != 1 && direction.y != 0){
+                    directionMove = "X"
+                    direction = {
+                        x:-1,
+                        y:0
+                    };
+                }
+            }
+            
+        }
+
+
+        /*interval function to move the snake*/
+        var Interval = setInterval(()=>{ 
+        /*If snake length is equal to array Starting position length the set new X and Y */
+            if(snakeLength == startingPosition.length){
+                const positionX= startingPosition[startingPosition.length-1].x + direction.x;
+                const positionY= startingPosition[startingPosition.length-1].y + direction.y;
+                /*If we are on last position at outer border and we will lose, then add new possiton but dont shift array...*/
+                if(positionX > n-1 || positionY > n-1 || positionX < 0 || positionY < 0 || array[positionY][positionX] == "taken"){
+                    alert("You lose! here you can start a new game!");
+                    snakeLength = 2;
+
+                    foodBoolean = false;
+                    clearInterval(setInterval);
+
+                    direction = {
+                        x:1,
+                        y:0
+                    }                     
+                    startingPosition = [
+                        {x:5,y:12},
+                        {x:6,y:12}
+                    ];
+                    setArray(n);
+                    return;
+                }else if(array[positionY][positionX] == "food"){
+
+                    const newPosition = {
+                    x: positionX,
+                    y: positionY
+                    }
+                    /*checking directionMove var and adding one more position*/
+                    if(directionMove=="X"){
+                        var newPositionTwo = {
+                            x: positionX+1,
+                            y:positionY
+                        }
+                    }
+                    else if(directionMove=="Y"){
+                        var newPositionTwo = {
+                            x: positionX,
+                            y:positionY+1
+                        }
+                    }
+
+                    /*Setting snake end position in array to null and adding new position*/
+                    array[startingPosition[0].y][startingPosition[0].x] = null;
+                    array[newPosition.x][newPosition.y] == "taken";
+                    array[newPositionTwo.x][newPositionTwo.y] == "taken";
+
+                    foodBoolean = false;
+                    snakeLength = snakeLength + 1;
+                    startingPosition.push(newPosition);
+                    
+                    addRows(n)
+                    return
+                }   
+                else{
+                    
+                    const newPosition = {
+                    x: positionX,
+                    y: positionY
+                    }
+
+                    /*Setting snake end position in array to null and adding new position*/
+                    array[startingPosition[0].y][startingPosition[0].x] = null;
+                    array[newPosition.y][newPosition.x] = "taken";
+
+                    /*Removing end position of snake in array and adding new, and after that  calling the function to create a table*/
+                    startingPosition.shift();
+                    startingPosition.push(newPosition);
+                    addRows(n)
+                }
+
+            }
+
+        },75)
+
+
+
+        /*Function to set food in table*/
+        function setFood(){
+            const randNumbers = setRandom();
+            if(array[randNumbers.y][randNumbers.x] == "taken") randNumbers = setRandom();
+            /*if this position of array is null and boolean to show  food is false then show food on random place*/
+            if(array[randNumbers.y][randNumbers.x] == null && !foodBoolean && array[randNumbers.y][randNumbers.x] != "taken"){
+                array[randNumbers.y][randNumbers.x] = "food";
+                foodBoolean = true;
+                addRows(25);
+            }
+        }
+        
+
+        /*Set random numbers method*/
+        function setRandom(){
+            const randomX = Math.floor(Math.random() * (n) );
+            const randomY = Math.floor(Math.random() * (n) );
+            return{x:randomX,y:randomY}
+        }
+
+
+
+        setArray(n)
+
+    </script>
+</body>
+</html>
